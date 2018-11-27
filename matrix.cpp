@@ -55,7 +55,7 @@ class Matrix
         class Matrix *m;
         size_t col;
     public:
-        const auto & operator[](const size_t &row) const
+        auto & operator[](const size_t &row)
         {
             std::cout << "const operator2[" << row << "] (col = " << col << ")" << std::endl;
             node n{row, col};
@@ -85,12 +85,13 @@ int main()
     std::cout << "size = " << matrix.size() << std::endl;
 
 //    matrix[0][0];
-//    matrix[0][0] = 15;
+    matrix[0][0] = 15;
     std::cout << matrix[0][0] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
 
-//    (matrix[0][0] = 16) = 13;
+    (matrix[0][0] = 16) = 13;
     std::cout << matrix[0][1] << std::endl;
+    std::cout << matrix[0][0] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
 
     return 0;
