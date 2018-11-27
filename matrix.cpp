@@ -51,25 +51,22 @@ class Matrix
 
     struct supClass
     {
-        supClass(data_container *m, size_t col) : m(m), col(col) {}
-        data_container *m;
+        supClass(class Matrix *m, size_t col) : m(m), col(col) {}
+        class Matrix *m;
         size_t col;
     public:
-        auto & operator[](const size_t &row)
-//        void operator[](const size_t &row)
+        const auto & operator[](const size_t &row) const
         {
-            std::cout << "operator2[" << row << "] (col = " << col << ")" << std::endl;
+            std::cout << "const operator2[" << row << "] (col = " << col << ")" << std::endl;
             node n{row, col};
-//            std::cout << "n{size_t,size_t} = " << typeid(n).name() << std::endl;
-//            std::cout << "m::key_type = " << typeid(*m).name() << std::endl;
-            return (*m)[n];
+            return m->m[n];
         }
     };
 
 public:
     supClass operator[](const size_t &col)
     {
-        supClass o{&m, col};
+        supClass o{this, col};
         std::cout << "operator1[" << col << "]" << std::endl;
         return o;
     }
@@ -80,6 +77,7 @@ public:
     }
 };
 #endif
+    
 
 int main()
 {
@@ -87,12 +85,12 @@ int main()
     std::cout << "size = " << matrix.size() << std::endl;
 
 //    matrix[0][0];
-    matrix[0][0] = 15;
+//    matrix[0][0] = 15;
     std::cout << matrix[0][0] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
 
-    (matrix[0][0] = 16) = 13;
-    std::cout << matrix[0][0] << std::endl;
+//    (matrix[0][0] = 16) = 13;
+    std::cout << matrix[0][1] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
 
     return 0;
