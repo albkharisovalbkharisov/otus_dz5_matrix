@@ -57,7 +57,7 @@ class Matrix
     public:
         auto & operator[](const size_t &row)
         {
-            std::cout << "const operator2[" << row << "] (col = " << col << ")" << std::endl;
+            std::cout << "operator2[" << row << "] (col = " << col << ")" << std::endl;
             node n{row, col};
             return m->m[n];
         }
@@ -69,6 +69,12 @@ public:
         supClass o{this, col};
         std::cout << "operator1[" << col << "]" << std::endl;
         return o;
+    }
+
+    Matrix & operator=(const T &t)
+    {
+        std::cout << "operatorT=" << t << std::endl;
+        return *this;
     }
 
     size_t size(void)
@@ -84,7 +90,7 @@ int main()
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
     std::cout << "size = " << matrix.size() << std::endl;
 
-//    matrix[0][0];
+    matrix[0][0];
     matrix[0][0] = 15;
     std::cout << matrix[0][0] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
