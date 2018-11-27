@@ -5,6 +5,7 @@
 #include <typeinfo>
 #include <type_traits>
 
+
 #if 0
 template <typename T, T V>
 class Matrix
@@ -16,6 +17,7 @@ class Matrix
 template <typename T, T V>
 class Matrix
 {
+    friend class miniMatrix;
     struct nodeHash;
     const T c = V;
     class node
@@ -49,41 +51,78 @@ class Matrix
 
     data_container m;
 
-    struct supClass
-    {
-        supClass(class Matrix *m, size_t col) : m(m), col(col) {}
-        class Matrix *m;
-        size_t col;
-    public:
-        auto & operator[](const size_t &row)
-        {
-            std::cout << "operator2[" << row << "] (col = " << col << ")" << std::endl;
-            node n{row, col};
-            return m->m[n];
-        }
-    };
-
 public:
-    supClass operator[](const size_t &col)
+    auto operator[](const size_t &col)
     {
-        supClass o{this, col};
+        miniMatrix o{this, col};
         std::cout << "operator1[" << col << "]" << std::endl;
         return o;
-    }
-
-    Matrix & operator=(const T &t)
-    {
-        std::cout << "operatorT=" << t << std::endl;
-        return *this;
     }
 
     size_t size(void)
     {
         return m.size();
     }
+
+
+    ///////////////////////////////////////////////////////////
+    class miniMatrix
+    {
+        miniMatrix(class Matrix *m, size_t col) : m(m), col(col) {}
+        class Matrix *m;
+        size_t col;
+        size_t row;
+    public:
+        auto & operator[](const size_t &row)
+        {
+    //        miniMatrixOut mmo{m, col, row};
+            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
+            this->row = row;
+            return *this;
+        }
+        miniMatrix & operator=(T &t)
+        {
+            std::cout << "operatorT=" << t << std::endl;
+
+            auto search = m->m.find(node{row, col});
+            if (search != m->m.end()) {
+                std::cout << "Found " << search->first << " " << search->second << '\n';
+            } else {
+                std::cout << "Not found\n";
+            }
+            return *this;
+        }
+        T& gett(void)
+        {
+            return m->m[node{row, col}];
+        }
+    };
 };
 #endif
-    
+
+//class miniMatrixOut
+//{
+//    miniMatrixOut(class Matrix *m, size_t col, size_t row) : m(m), col(col), row(row) {}
+//    class Matrix *m;
+//    size_t col;
+//    size_t row;
+//    miniMatrixOut & operator=(T &t)
+//    {
+//        std::cout << "operatorT=" << t << std::endl;
+//
+//        auto search = m->m.find(node{row, col});
+//        if (search != m->m.end()) {
+//            std::cout << "Found " << search->first << " " << search->second << '\n';
+//        } else {
+//            std::cout << "Not found\n";
+//        }
+//        return *this;
+//    }
+//}
+
+
+
+
 
 int main()
 {
