@@ -83,14 +83,20 @@ public:
         miniMatrix & operator=(T &t)
         {
             std::cout << "operatorT=" << t << std::endl;
-
+            if (t == m->c)
+                std::cout << "same, ignore" << std::endl;
+            else
+                m->m[node{row, col}] = t;
+#if 0
             auto search = m->m.find(node{row, col});
             if (search != m->m.end()) {
                 std::cout << "Found " << search->first << " " << search->second << '\n';
+                search->second = t;
             } else {
                 std::cout << "Not found\n";
             }
             return *this;
+#endif
         }
         T& gett(void)
         {
