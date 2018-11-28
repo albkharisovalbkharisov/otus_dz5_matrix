@@ -22,9 +22,9 @@ class Matrix
     const T c = V;
     class node
     {
+    public:
         size_t row;
         size_t col;
-    public:
         node (const size_t &row, const size_t &col) : row(row), col(col) {}
         bool operator==(const node &other) const
         {
@@ -68,11 +68,11 @@ public:
     ///////////////////////////////////////////////////////////
     class miniMatrix
     {
+    public:
         miniMatrix(class Matrix *m, size_t col) : m(m), col(col) {}
         class Matrix *m;
         size_t col;
         size_t row;
-    public:
         auto & operator[](const size_t &row)
         {
     //        miniMatrixOut mmo{m, col, row};
@@ -80,17 +80,22 @@ public:
             this->row = row;
             return *this;
         }
-        miniMatrix & operator=(T &t)
+        miniMatrix & operator=(const T &t)
         {
             std::cout << "operatorT=" << t << std::endl;
+#if 0
             if (t == m->c)
                 std::cout << "same, ignore" << std::endl;
             else
                 m->m[node{row, col}] = t;
-#if 0
+            return *this;
+#else
             auto search = m->m.find(node{row, col});
             if (search != m->m.end()) {
                 std::cout << "Found " << search->first << " " << search->second << '\n';
+            if (t == m->c)
+                // remove element
+            else
                 search->second = t;
             } else {
                 std::cout << "Not found\n";
@@ -102,6 +107,10 @@ public:
         {
             return m->m[node{row, col}];
         }
+//        operator << ()            // TODO: overload!
+//        {
+//
+//        }
     };
 };
 #endif
@@ -137,13 +146,14 @@ int main()
 
     matrix[0][0];
     matrix[0][0] = 15;
-    std::cout << matrix[0][0] << std::endl;
-    std::cout << "size = " << matrix.size() << std::endl;
+//    std::cout << matrix[0][0] << std::endl;
+//    std::cout << "size = " << matrix.size() << std::endl;
 
     (matrix[0][0] = 16) = 13;
-    std::cout << matrix[0][1] << std::endl;
-    std::cout << matrix[0][0] << std::endl;
-    std::cout << "size = " << matrix.size() << std::endl;
+    (matrix[0][0] = 16) = -1;
+//    std::cout << matrix[0][1] << std::endl;
+//    std::cout << matrix[0][0] << std::endl;
+//    std::cout << "size = " << matrix.size() << std::endl;
 
     return 0;
 }
