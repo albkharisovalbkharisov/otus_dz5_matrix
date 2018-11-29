@@ -4,7 +4,7 @@
 #include <functional>       // dbg_
 #include <typeinfo>
 #include <type_traits>
-
+#include <utility>
 
 #if 0
 template <typename T, T V>
@@ -69,48 +69,59 @@ public:
     class miniMatrix
     {
     public:
-        miniMatrix(class Matrix *m, size_t col) : m(m), col(col) {}
-        class Matrix *m;
+        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col) {}
+        class Matrix *mat;
         size_t col;
         size_t row;
         auto & operator[](const size_t &row)
         {
-    //        miniMatrixOut mmo{m, col, row};
 //            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
             this->row = row;
             return *this;
         }
         miniMatrix & operator=(const T &t)
         {
-            std::cout << "operatorT=" << t << std::endl;
-#if 0
-            if (t == m->c)
-                std::cout << "same, ignore" << std::endl;
-            else
-                m->m[node{row, col}] = t;
-            return *this;
-#else
-            auto search = m->m.find(node{row, col});
-            if (search != m->m.end()) {
-                std::cout << "Found " /*<< search->first */<< " " << search->second << '\n';
-                if (t == m->c)
-                    m->m.erase(node{row, col});
+//            std::cout << "operatorT=" << t << std::endl;
+            auto n = node{row, col};
+            auto search = mat->m.find(n);
+
+//            std::cout << "==================================" << std::endl;
+//            for (auto a : mat->m)
+//                std::cout << a.second << std::endl;
+//            std::cout << "==================================" << std::endl;
+
+            if (search != mat->m.end()) {
+//                std::cout << "Found " /*<< search->first */<< " " << search->second << '\n';
+                if (t == mat->c)
+                    mat->m.erase(search);
                 else
                     search->second = t;
             } else {
-                std::cout << "Not found\n";
+                if (t != mat->c)
+                    mat->m.insert(std::make_pair(n, t));
+//                std::make_pair<std::string,double>("eggs",6.0)
+//                std::cout << "Not found\n";
             }
             return *this;
-#endif
         }
-        T& gett(void)
+        const T& gett(void) const
         {
-            return m->m[node{row, col}];
+            auto search = mat->m.find(node{row, col});
+//            std::cout << "node: " << row << "," << col;
+            if (search != mat->m.end()) {
+//                std::cout << " : " << search->second << std::endl;
+                return search->second;
+            }
+            else {
+//                std::cout << " : not found " << std::endl;
+                return mat->c;
+            }
         }
 
         friend std::ostream& operator<< (std::ostream &os, const miniMatrix &mm )
         {
-            std::cout << gett();
+            //std::cout << mm.gett();
+            std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();
             return os;
         }
     };
@@ -129,13 +140,25 @@ int main()
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
     std::cout << "size = " << matrix.size() << std::endl;
 
-    matrix[0][0];
+    std::cout << matrix[0][0] << std::endl;
     matrix[0][0] = 15;
+    std::cout << matrix[0][0] << std::endl;
+    matrix[0][0] = 16;
+    std::cout << matrix[0][0] << std::endl;
+    matrix[0][0] = 19;
+    std::cout << matrix[0][0] << std::endl;
+    matrix[0][1] = 16;
+    std::cout << matrix[0][1] << std::endl;
+    matrix[0][1] = 17;
+    std::cout << "size = " << matrix.size() << std::endl;
+    matrix[0][0] = -1;
+    std::cout << matrix[0][1] << std::endl;
+    std::cout << "size = " << matrix.size() << std::endl;
 //    std::cout << matrix[0][0] << std::endl;
 //    std::cout << "size = " << matrix.size() << std::endl;
 
-    (matrix[0][0] = 16) = 13;
-    (matrix[0][0] = 16) = -1;
+//    (matrix[0][0] = 16) = 13;
+//    (matrix[0][0] = 16) = -1;
 //    std::cout << matrix[0][1] << std::endl;
 //    std::cout << matrix[0][0] << std::endl;
 //    std::cout << "size = " << matrix.size() << std::endl;
