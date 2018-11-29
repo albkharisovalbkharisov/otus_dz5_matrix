@@ -154,6 +154,9 @@ int main()
     matrix[0][0] = -1;
     std::cout << matrix[0][1] << std::endl;
     std::cout << "size = " << matrix.size() << std::endl;
+    ((matrix[0][1] = -1) = 15) = -1;
+    std::cout << matrix[0][1] << std::endl;
+    std::cout << "size = " << matrix.size() << std::endl;
 //    std::cout << matrix[0][0] << std::endl;
 //    std::cout << "size = " << matrix.size() << std::endl;
 
