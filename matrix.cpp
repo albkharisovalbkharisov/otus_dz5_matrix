@@ -55,7 +55,7 @@ public:
     auto operator[](const size_t &col)
     {
         miniMatrix o{this, col};
-        std::cout << "operator1[" << col << "]" << std::endl;
+//        std::cout << "operator1[" << col << "]" << std::endl;
         return o;
     }
 
@@ -76,7 +76,7 @@ public:
         auto & operator[](const size_t &row)
         {
     //        miniMatrixOut mmo{m, col, row};
-            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
+//            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
             this->row = row;
             return *this;
         }
@@ -92,11 +92,11 @@ public:
 #else
             auto search = m->m.find(node{row, col});
             if (search != m->m.end()) {
-                std::cout << "Found " << search->first << " " << search->second << '\n';
-            if (t == m->c)
-                // remove element
-            else
-                search->second = t;
+                std::cout << "Found " /*<< search->first */<< " " << search->second << '\n';
+                if (t == m->c)
+                    m->m.erase(node{row, col});
+                else
+                    search->second = t;
             } else {
                 std::cout << "Not found\n";
             }
@@ -107,35 +107,20 @@ public:
         {
             return m->m[node{row, col}];
         }
-//        operator << ()            // TODO: overload!
-//        {
-//
-//        }
+
+        friend std::ostream& operator<< (std::ostream &os, const miniMatrix &mm )
+        {
+            std::cout << gett();
+            return os;
+        }
     };
 };
 #endif
 
-//class miniMatrixOut
+//std::ostream& operator<< (std::ostream &out, const miniMatrix &mm)
 //{
-//    miniMatrixOut(class Matrix *m, size_t col, size_t row) : m(m), col(col), row(row) {}
-//    class Matrix *m;
-//    size_t col;
-//    size_t row;
-//    miniMatrixOut & operator=(T &t)
-//    {
-//        std::cout << "operatorT=" << t << std::endl;
-//
-//        auto search = m->m.find(node{row, col});
-//        if (search != m->m.end()) {
-//            std::cout << "Found " << search->first << " " << search->second << '\n';
-//        } else {
-//            std::cout << "Not found\n";
-//        }
-//        return *this;
-//    }
+//    std::cout << gett();
 //}
-
-
 
 
 
