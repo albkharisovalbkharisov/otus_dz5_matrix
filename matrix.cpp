@@ -62,15 +62,27 @@ public:
         return m.size();
     }
 
-
     ///////////////////////////////////////////////////////////
     class miniMatrix
     {
     public:
-        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col) {}
+        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col), it(mat->m.begin()) {}
         class Matrix *mat;
         size_t col;
         size_t row;
+        decltype(mat->m.begin()) it;
+        
+//        auto operator=(std::tie<>, const miniMatrix &mm)
+//        {
+//            auto n = it->first;
+//            return std::tie(n.row, n.col, it->second);
+//        }
+
+        operator tuple<size_t, size_t, T>() const
+        {
+            return forward_as_tuple(row, col, it->second);
+        }
+
         auto & operator[](const size_t &row)
         {
 //            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
@@ -116,6 +128,16 @@ public:
             }
         }
 
+        auto begin(void)
+        {
+            return miniMatrix{mat->m.begin()};
+        }
+
+        auto end(void)
+        {
+            return miniMatrix{mat->m.end()};
+        }
+
         friend std::ostream& operator<< (std::ostream &os, const miniMatrix &mm )
         {
             //std::cout << mm.gett();
@@ -123,6 +145,60 @@ public:
             return os;
         }
     };
+
+#if 0
+    struct MyIt : std::iterator<std::forward_iterator_tag, const T>
+    {
+        node** p;
+        MyIt(const MyIt & myit) = default;
+        MyIt() = default;
+        MyIt(node** const &ptr) : p(ptr) {};
+
+        MyIt & operator=(MyIt &&)      = default;
+        MyIt & operator=(MyIt const &) = default;
+
+        bool operator==(const MyIt& rhs) const
+        {
+            return this->p == rhs.p;
+        }
+
+        bool operator!=(const MyIt& rhs) const
+        {
+            return !(*this == rhs);
+        }
+
+        MyIt& operator++ ()
+        {
+            if (*p != nullptr)
+                p = &(*p)->next;
+            return *this;
+        }
+        MyIt operator++(int) { MyIt temp = *this; ++*this; return temp; }
+
+        const T& operator* () const
+        {
+            return (*p)->o;
+        }
+        const T * operator->() const
+        {
+            return &(*p)->o;
+        }
+    };
+
+    MyIt begin()
+    {
+        return MyIt(&head);
+    }
+
+    MyIt end()
+    {
+        node** p = &head;
+        for ( ; *p != nullptr; p = &(*p)->next);
+        return MyIt(p);
+    }
+
+    using iterator = MyIt;
+#endif
 };
 
 
@@ -170,16 +246,24 @@ int main()
 //    assert(matrix[100][100] == 314);
 //    assert(matrix.size() == 1);
 
+
+    size_t x = 5;
+    size_t y = 5;
+    int v = 17;
+    std::tie(x, y, v) = matrix[0][0];
+
+#if 0
     // 100100314
-//    for(auto c: matrix)
-//    {
+    for(auto c: matrix)
+    {
 //        int x;
 //        int y;
 //        int v;
 //        std::tie(x, y, v) = c;
 //        std::cout << x << y << v << std::endl;
-//    }
-
+        std::cout << c << std::endl;
+    }
+#endif
 
 #endif
     return 0;
