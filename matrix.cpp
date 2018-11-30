@@ -1,19 +1,13 @@
 #include <iostream>
 #include <unordered_map>
+//#include <map>
 #include <forward_list>
 #include <functional>       // dbg_
 #include <typeinfo>
 #include <type_traits>
 #include <utility>
+#include <assert.h>
 
-#if 0
-template <typename T, T V>
-class Matrix
-{
-    const T c = V;
-};
-
-#else
 template <typename T, T V>
 class Matrix
 {
@@ -32,10 +26,14 @@ class Matrix
         }
 
         friend struct nodeHash;
+        bool operator < (const node &n)
+        {
+            return n.row < this->row;
+        }
     };
-    using data_container = typename std::unordered_map<node, T, nodeHash>;
+//    using data_container = typename std::map<node, T>;
 
-    // custom hash can be a standalone function object:
+    using data_container = typename std::unordered_map<node, T, nodeHash>;
     struct nodeHash
     {
         size_t operator()(const node &s) const noexcept
@@ -126,17 +124,12 @@ public:
         }
     };
 };
-#endif
-
-//std::ostream& operator<< (std::ostream &out, const miniMatrix &mm)
-//{
-//    std::cout << gett();
-//}
 
 
 
 int main()
 {
+#if 0
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
     std::cout << "size = " << matrix.size() << std::endl;
 
@@ -165,7 +158,30 @@ int main()
 //    std::cout << matrix[0][1] << std::endl;
 //    std::cout << matrix[0][0] << std::endl;
 //    std::cout << "size = " << matrix.size() << std::endl;
+#else
+    Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
+//    assert(matrix.size() == 0); // все ячейки свободны
+//    auto a = matrix[0][0];
+    std::cout << matrix[0][0] << std::endl;
+//    assert(a == -1);
+//    assert(matrix.size() == 0);
+    matrix[100][100] = 314;
+    std::cout << matrix[100][100] << std::endl;
+//    assert(matrix[100][100] == 314);
+//    assert(matrix.size() == 1);
 
+    // 100100314
+//    for(auto c: matrix)
+//    {
+//        int x;
+//        int y;
+//        int v;
+//        std::tie(x, y, v) = c;
+//        std::cout << x << y << v << std::endl;
+//    }
+
+
+#endif
     return 0;
 }
 
