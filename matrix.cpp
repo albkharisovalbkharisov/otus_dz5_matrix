@@ -78,10 +78,6 @@ public:
 //            return std::tie(n.row, n.col, it->second);
 //        }
 
-        operator tuple<size_t, size_t, T>() const
-        {
-            return forward_as_tuple(row, col, it->second);
-        }
 
         auto & operator[](const size_t &row)
         {
@@ -114,35 +110,55 @@ public:
             }
             return *this;
         }
-        const T& gett(void) const
+        T gettt(void)
         {
             auto search = mat->m.find(node{row, col});
-//            std::cout << "node: " << row << "," << col;
             if (search != mat->m.end()) {
-//                std::cout << " : " << search->second << std::endl;
                 return search->second;
             }
             else {
-//                std::cout << " : not found " << std::endl;
+                return mat->c;
+            }
+        }
+        const T& gett(void) const
+        {
+            auto search = mat->m.find(node{row, col});
+            if (search != mat->m.end()) {
+                return search->second;
+            }
+            else {
                 return mat->c;
             }
         }
 
-        auto begin(void)
-        {
-            return miniMatrix{mat->m.begin()};
-        }
-
-        auto end(void)
-        {
-            return miniMatrix{mat->m.end()};
-        }
+//        auto begin(void)
+//        {
+//            return miniMatrix{mat->m.begin()};
+//        }
+//
+//        auto end(void)
+//        {
+//            return miniMatrix{mat->m.end()};
+//        }
 
         friend std::ostream& operator<< (std::ostream &os, const miniMatrix &mm )
         {
             //std::cout << mm.gett();
             std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();
             return os;
+        }
+
+        template <typename S1, typename S2, typename T1>
+        operator std::tuple<S1, S2, T1>()
+        {
+            std::cout << "AAAAAAAAA" << std::endl;
+//            static int a = 17;
+            static T b = mat->c;
+//            return std::tuple<S1, S2, T1>(row, col, gettt() );
+            return std::tuple<S1, S2, T1>(row, col, b );
+//            return std::tuple<size_t &, size_t &, T&>(row, col, gett() );
+//            return std::tuple<size_t &, size_t &, T&>(row, col, mat->m[node{row,col}]);
+//            return std::tuple<size_t &, size_t &, T&>(row, col, a);
         }
     };
 
@@ -250,7 +266,11 @@ int main()
     size_t x = 5;
     size_t y = 5;
     int v = 17;
-    std::tie(x, y, v) = matrix[0][0];
+    std::tie(x, y, v) = matrix[100][100];
+    std::cout << "xyv=" << x << y << v << std::endl;
+    v = 99;
+    std::tie(x, y, v) = matrix[100][100];
+    std::cout << "xyv=" << x << y << v << std::endl;
 
 #if 0
     // 100100314
