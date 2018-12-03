@@ -14,6 +14,7 @@ class Matrix
     friend class miniMatrix;
     struct nodeHash;
     const T c = V;
+
     class node
     {
     public:
@@ -31,7 +32,6 @@ class Matrix
             return n.row < this->row;
         }
     };
-//    using data_container = typename std::map<node, T>;
 
     using data_container = typename std::unordered_map<node, T, nodeHash>;
     struct nodeHash
@@ -65,61 +65,7 @@ public:
     ///////////////////////////////////////////////////////////
     class miniMatrix
     {
-    public:
-        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col), it(mat->m.begin()) {}
-        class Matrix *mat;
-        size_t col;
-        size_t row;
-        decltype(mat->m.begin()) it;
-        
-//        auto operator=(std::tie<>, const miniMatrix &mm)
-//        {
-//            auto n = it->first;
-//            return std::tie(n.row, n.col, it->second);
-//        }
-
-
-        auto & operator[](const size_t &row)
-        {
-//            std::cout << "operator2[" << col << "][" << row << "]" << std::endl;
-            this->row = row;
-            return *this;
-        }
-        miniMatrix & operator=(const T &t)
-        {
-//            std::cout << "operatorT=" << t << std::endl;
-            auto n = node{row, col};
-            auto search = mat->m.find(n);
-
-//            std::cout << "==================================" << std::endl;
-//            for (auto a : mat->m)
-//                std::cout << a.second << std::endl;
-//            std::cout << "==================================" << std::endl;
-
-            if (search != mat->m.end()) {
-//                std::cout << "Found " /*<< search->first */<< " " << search->second << '\n';
-                if (t == mat->c)
-                    mat->m.erase(search);
-                else
-                    search->second = t;
-            } else {
-                if (t != mat->c)
-                    mat->m.insert(std::make_pair(n, t));
-//                std::make_pair<std::string,double>("eggs",6.0)
-//                std::cout << "Not found\n";
-            }
-            return *this;
-        }
-        T gettt(void)
-        {
-            auto search = mat->m.find(node{row, col});
-            if (search != mat->m.end()) {
-                return search->second;
-            }
-            else {
-                return mat->c;
-            }
-        }
+    private:
         const T& gett(void) const
         {
             auto search = mat->m.find(node{row, col});
@@ -131,19 +77,48 @@ public:
             }
         }
 
-//        auto begin(void)
-//        {
-//            return miniMatrix{mat->m.begin()};
-//        }
-//
-//        auto end(void)
-//        {
-//            return miniMatrix{mat->m.end()};
-//        }
-
-        friend std::ostream& operator<< (std::ostream &os, const miniMatrix &mm )
+        class Matrix *mat;
+        size_t col;
+        size_t row;
+    public:
+        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col), it(mat->m.begin()) {}
+        decltype(mat->m.begin()) it;
+        
+        auto & operator[](const size_t &row)
         {
-            //std::cout << mm.gett();
+            this->row = row;
+            return *this;
+        }
+
+        miniMatrix & operator=(const T &t)
+        {
+            auto n = node{row, col};
+            auto search = mat->m.find(n);
+
+            if (search != mat->m.end()) {
+                if (t == mat->c)
+                    mat->m.erase(search);
+                else
+                    search->second = t;
+            } else {
+                if (t != mat->c)
+                    mat->m.insert(std::make_pair(n, t));
+            }
+            return *this;
+        }
+
+        auto begin(void)
+        {
+            return miniMatrix{mat->m.begin()};
+        }
+
+        auto end(void)
+        {
+            return miniMatrix{mat->m.end()};
+        }
+
+        friend std::ostream& operator<< (std::ostream &os, miniMatrix &mm )
+        {
             std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();
             return os;
         }
@@ -151,14 +126,8 @@ public:
         template <typename S1, typename S2, typename T1>
         operator std::tuple<S1, S2, T1>()
         {
-            std::cout << "AAAAAAAAA" << std::endl;
-//            static int a = 17;
-            static T b = mat->c;
-//            return std::tuple<S1, S2, T1>(row, col, gettt() );
-            return std::tuple<S1, S2, T1>(row, col, b );
-//            return std::tuple<size_t &, size_t &, T&>(row, col, gett() );
-//            return std::tuple<size_t &, size_t &, T&>(row, col, mat->m[node{row,col}]);
-//            return std::tuple<size_t &, size_t &, T&>(row, col, a);
+            // remove 'const' for passing to tuple only. It's safe.
+            return std::tuple<S1, S2, T1>(row, col, const_cast<T&>(gett()));
         }
     };
 
@@ -252,15 +221,15 @@ int main()
 //    std::cout << "size = " << matrix.size() << std::endl;
 #else
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
-//    assert(matrix.size() == 0); // все ячейки свободны
-//    auto a = matrix[0][0];
+    assert(matrix.size() == 0); // все ячейки свободны
+    auto a = matrix[0][0];
     std::cout << matrix[0][0] << std::endl;
-//    assert(a == -1);
-//    assert(matrix.size() == 0);
+    assert(a == -1);
+    assert(matrix.size() == 0);
     matrix[100][100] = 314;
     std::cout << matrix[100][100] << std::endl;
-//    assert(matrix[100][100] == 314);
-//    assert(matrix.size() == 1);
+    assert(matrix[100][100] == 314);
+    assert(matrix.size() == 1);
 
 
     size_t x = 5;
@@ -268,8 +237,7 @@ int main()
     int v = 17;
     std::tie(x, y, v) = matrix[100][100];
     std::cout << "xyv=" << x << y << v << std::endl;
-    v = 99;
-    std::tie(x, y, v) = matrix[100][100];
+    std::tie(x, y, v) = matrix[0][0];
     std::cout << "xyv=" << x << y << v << std::endl;
 
 #if 0
