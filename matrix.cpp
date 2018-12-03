@@ -27,10 +27,10 @@ class Matrix
         }
 
         friend struct nodeHash;
-        bool operator < (const node &n)
-        {
-            return n.row < this->row;
-        }
+//        bool operator < (const node &n)
+//        {
+//            return n.row < this->row;
+//        }
     };
 
     using data_container = typename std::unordered_map<node, T, nodeHash>;
@@ -82,8 +82,16 @@ public:
         size_t row;
     public:
         miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col), it(mat->m.begin()) {}
+        miniMatrix(decltype(mat->m.begin()) it) {
+            it(mat->m.begin());
+        }
         decltype(mat->m.begin()) it;
         
+        bool operator==(const T& other)
+        {
+            return this->gett() == other;
+        }
+
         auto & operator[](const size_t &row)
         {
             this->row = row;
@@ -220,6 +228,7 @@ int main()
 //    std::cout << matrix[0][0] << std::endl;
 //    std::cout << "size = " << matrix.size() << std::endl;
 #else
+#if 0
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
     assert(matrix.size() == 0); // все ячейки свободны
     auto a = matrix[0][0];
@@ -239,17 +248,22 @@ int main()
     std::cout << "xyv=" << x << y << v << std::endl;
     std::tie(x, y, v) = matrix[0][0];
     std::cout << "xyv=" << x << y << v << std::endl;
-
-#if 0
+#endif
+#if 1
+    Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
+    matrix[100][100] = 314;
     // 100100314
     for(auto c: matrix)
     {
-//        int x;
-//        int y;
-//        int v;
-//        std::tie(x, y, v) = c;
-//        std::cout << x << y << v << std::endl;
+#if 1
+        int x;
+        int y;
+        int v;
+        std::tie(x, y, v) = c;
+        std::cout << x << y << v << std::endl;
+#else
         std::cout << c << std::endl;
+#endif  // 0
     }
 #endif
 
