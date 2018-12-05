@@ -1,8 +1,7 @@
 #include <iostream>
 #include <unordered_map>
-//#include <map>
 #include <forward_list>
-#include <functional>       // dbg_
+#include <functional>
 #include <typeinfo>
 #include <type_traits>
 #include <utility>
@@ -18,6 +17,7 @@ class Matrix
     class node
     {
     public:
+        friend struct nodeHash;
         size_t row;
         size_t col;
         node (const size_t &row, const size_t &col) : row(row), col(col) {}
@@ -25,15 +25,10 @@ class Matrix
         {
             return (this->row == other.row) && (this->col == other.col);
         }
-
-        friend struct nodeHash;
-//        bool operator < (const node &n)
-//        {
-//            return n.row < this->row;
-//        }
     };
 
     using data_container = typename std::unordered_map<node, T, nodeHash>;
+
     struct nodeHash
     {
         size_t operator()(const node &s) const noexcept
@@ -44,8 +39,14 @@ class Matrix
         }
     };
 
-
     //////////////////// Hash, Key, Node and other staff //////////////////////
+
+//    template <typename S1, typename S2, typename T1>
+//    operator std::tuple<S1, S2, T1>(const typename data_container::value_type &pair)
+//    {
+//        auto n = pair.first;
+//        return std::tuple<S1, S2, T1>(n.row, n.col, pair.second);
+//    }
 
     data_container m;
 
@@ -53,8 +54,13 @@ public:
     auto operator[](const size_t &col)
     {
         miniMatrix o{this, col};
-//        std::cout << "operator1[" << col << "]" << std::endl;
         return o;
+    }
+
+    miniMatrix begin(void)
+    {
+        ;
+            if (search != mat->m.end()) {
     }
 
     size_t size(void)
@@ -138,137 +144,22 @@ public:
             return std::tuple<S1, S2, T1>(row, col, const_cast<T&>(gett()));
         }
     };
-
-#if 0
-    struct MyIt : std::iterator<std::forward_iterator_tag, const T>
-    {
-        node** p;
-        MyIt(const MyIt & myit) = default;
-        MyIt() = default;
-        MyIt(node** const &ptr) : p(ptr) {};
-
-        MyIt & operator=(MyIt &&)      = default;
-        MyIt & operator=(MyIt const &) = default;
-
-        bool operator==(const MyIt& rhs) const
-        {
-            return this->p == rhs.p;
-        }
-
-        bool operator!=(const MyIt& rhs) const
-        {
-            return !(*this == rhs);
-        }
-
-        MyIt& operator++ ()
-        {
-            if (*p != nullptr)
-                p = &(*p)->next;
-            return *this;
-        }
-        MyIt operator++(int) { MyIt temp = *this; ++*this; return temp; }
-
-        const T& operator* () const
-        {
-            return (*p)->o;
-        }
-        const T * operator->() const
-        {
-            return &(*p)->o;
-        }
-    };
-
-    MyIt begin()
-    {
-        return MyIt(&head);
-    }
-
-    MyIt end()
-    {
-        node** p = &head;
-        for ( ; *p != nullptr; p = &(*p)->next);
-        return MyIt(p);
-    }
-
-    using iterator = MyIt;
-#endif
 };
-
-
 
 int main()
 {
-#if 0
-    Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
-    std::cout << "size = " << matrix.size() << std::endl;
-
-    std::cout << matrix[0][0] << std::endl;
-    matrix[0][0] = 15;
-    std::cout << matrix[0][0] << std::endl;
-    matrix[0][0] = 16;
-    std::cout << matrix[0][0] << std::endl;
-    matrix[0][0] = 19;
-    std::cout << matrix[0][0] << std::endl;
-    matrix[0][1] = 16;
-    std::cout << matrix[0][1] << std::endl;
-    matrix[0][1] = 17;
-    std::cout << "size = " << matrix.size() << std::endl;
-    matrix[0][0] = -1;
-    std::cout << matrix[0][1] << std::endl;
-    std::cout << "size = " << matrix.size() << std::endl;
-    ((matrix[0][1] = -1) = 15) = -1;
-    std::cout << matrix[0][1] << std::endl;
-    std::cout << "size = " << matrix.size() << std::endl;
-//    std::cout << matrix[0][0] << std::endl;
-//    std::cout << "size = " << matrix.size() << std::endl;
-
-//    (matrix[0][0] = 16) = 13;
-//    (matrix[0][0] = 16) = -1;
-//    std::cout << matrix[0][1] << std::endl;
-//    std::cout << matrix[0][0] << std::endl;
-//    std::cout << "size = " << matrix.size() << std::endl;
-#else
-#if 0
-    Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
-    assert(matrix.size() == 0); // все ячейки свободны
-    auto a = matrix[0][0];
-    std::cout << matrix[0][0] << std::endl;
-    assert(a == -1);
-    assert(matrix.size() == 0);
-    matrix[100][100] = 314;
-    std::cout << matrix[100][100] << std::endl;
-    assert(matrix[100][100] == 314);
-    assert(matrix.size() == 1);
-
-
-    size_t x = 5;
-    size_t y = 5;
-    int v = 17;
-    std::tie(x, y, v) = matrix[100][100];
-    std::cout << "xyv=" << x << y << v << std::endl;
-    std::tie(x, y, v) = matrix[0][0];
-    std::cout << "xyv=" << x << y << v << std::endl;
-#endif
-#if 1
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
     matrix[100][100] = 314;
-    // 100100314
-    for(auto c: matrix)
-    {
-#if 1
-        int x;
-        int y;
-        int v;
-        std::tie(x, y, v) = c;
-        std::cout << x << y << v << std::endl;
-#else
-        std::cout << c << std::endl;
-#endif  // 0
-    }
-#endif
 
-#endif
-    return 0;
+//    for(auto c: matrix)
+//    {
+//        int x;
+//        int y;
+//        int v;
+//        std::tie(x, y, v) = c;
+//        std::cout << x << y << v << std::endl;
+//    }
+//    return 0;
 }
 
 
