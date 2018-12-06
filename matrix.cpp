@@ -10,24 +10,21 @@
 template <typename T, T V>
 class Matrix
 {
-    friend class miniMatrix;
     struct nodeHash;
     const T c = V;
 
-    class node
+    struct node
     {
-    public:
-        friend struct nodeHash;
         size_t row;
         size_t col;
+
         node (const size_t &row, const size_t &col) : row(row), col(col) {}
+
         bool operator==(const node &other) const
         {
             return (this->row == other.row) && (this->col == other.col);
         }
     };
-
-    using data_container = typename std::unordered_map<node, T, nodeHash>;
 
     struct nodeHash
     {
@@ -35,92 +32,49 @@ class Matrix
         {
             size_t h1 = std::hash<size_t>{}(s.row);
             size_t h2 = std::hash<size_t>{}(s.col);
-            return h1 ^ (h2 << 1); // or use boost::hash_combine (see Discussion)
+            return h1 ^ (h2 << 1);
         }
     };
 
-    //////////////////// Hash, Key, Node and other staff //////////////////////
-
-//    template <typename S1, typename S2, typename T1>
-//    operator std::tuple<S1, S2, T1>(const typename data_container::value_type &pair)
-//    {
-//        auto n = pair.first;
-//        return std::tuple<S1, S2, T1>(n.row, n.col, pair.second);
-//    }
+    using data_container = typename std::unordered_map<node, T, nodeHash>;
 
     data_container m;
 
-public:
-    class MatrixIt;
-    auto operator[](const size_t &col)
-    {
-        miniMatrix o{this, col};
-        return o;
-    }
-
-    MatrixIt begin(void)
-    {
-        std::cout << "begin()" << std::endl;
-        return MatrixIt{m.begin()};
-    }
-
-    MatrixIt end(void)
-    {
-        std::cout << "end()" << std::endl;
-        return MatrixIt{m.end()};
-    }
-
-    size_t size(void)
-    {
-        return m.size();
-    }
-
-///////////////////////////////////////////////////////
-    struct MatrixIt
+    // Support class to work with Range-Based for loop.
+    // Some kind of iterator wrapper. Developed for tuple conversion only.
+    class MatrixIt
     {
         typename data_container::iterator it;
-        MatrixIt(decltype(it) &&it) : it{it} {}
 
-        MatrixIt& operator++()
-        {
-            std::cout << "It op++" << std::endl;
+        public:
+        MatrixIt(decltype(it) &&it) : it{it} {}
+        MatrixIt& operator++() {
             ++it;
             return *this;
         }
 
-        MatrixIt& operator*()
-        {
-            std::cout << "It op*" << std::endl;
-//            size_t col, row;
-//            std::cout << "before col/row = " << col << "/" << row << std::endl;
-//            std::tie<col, row> = it->first;
-//            std::cout << "after col/row = " << col << "/" << row << std::endl;
-            return *this;
-        }
+        // does nothing, but it's necessery for RB-for-loop
+        MatrixIt& operator*() { return *this; }
 
-        bool operator!=(const MatrixIt& other)
-        {
-            std::cout << "It op!=" << std::endl;
+        bool operator!=(const MatrixIt& other) {
             return this->it != other.it;
         }
 
         template <typename S1, typename S2, typename T1>
         operator std::tuple<S1, S2, T1>()
         {
-            std::cout << "It castTuple" << std::endl;
             // remove 'const' for passing to tuple only. It's safe.
-//            return std::tuple<S1, S2, T1>(row, col, const_cast<T&>(gett()));
-            S1 row = it->first.row;
-            S2 col = it->first.col;
-            return std::tuple<S1, S2, T1>(row, col, it->second);
-//            return std::tuple<S1, S2, T1>(it->first.row, it->first.col, it->second);
+            return std::tuple<S1, S2, T1>(const_cast<S1>(it->first.row), const_cast<S1>(it->first.col), it->second);
         }
     };
 
-///////////////////////////////////////////////////////////
-    class miniMatrix
+    // Support class to work with [][] operator
+    class MatrixSup
     {
-    private:
+        class Matrix *mat;
+        size_t row;
+        size_t col;
+
         const T& gett(void) const
         {
             auto search = mat->m.find(node{row, col});
@@ -132,24 +86,21 @@ public:
             }
         }
 
-        class Matrix *mat;
-        size_t col;
-        size_t row;
     public:
-        miniMatrix(class Matrix *mat, size_t col) : mat(mat), col(col) {}
+        MatrixSup(class Matrix *mat, size_t row) : mat(mat), row(row) {}
 
         bool operator==(const T& other)
         {
             return this->gett() == other;
         }
 
-        auto & operator[](const size_t &row)
+        auto & operator[](const size_t &col)
         {
-            this->row = row;
+            this->col = col;
             return *this;
         }
 
-        miniMatrix & operator=(const T &t)
+        MatrixSup & operator=(const T &t)
         {
             auto n = node{row, col};
             auto search = mat->m.find(n);
@@ -166,37 +117,85 @@ public:
             return *this;
         }
 
-        friend std::ostream& operator<< (std::ostream &os, miniMatrix &mm )
+        friend std::ostream& operator<< (std::ostream &os, MatrixSup &mm )
         {
-            std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();
+//            std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();    // for tests only
+            std::cout << mm.gett();
             return os;
         }
-
-//        template <typename S1, typename S2, typename T1>
-//        operator std::tuple<S1, S2, T1>()
-//        {
-//            // remove 'const' for passing to tuple only. It's safe.
-//            return std::tuple<S1, S2, T1>(row, col, const_cast<T&>(gett()));
-//        }
     };
+
+public:
+    auto operator[](const size_t &col)
+    {
+        MatrixSup o{this, col};
+        return o;
+    }
+
+    MatrixIt begin(void)
+    {
+        return MatrixIt{m.begin()};
+    }
+
+    MatrixIt end(void)
+    {
+        return MatrixIt{m.end()};
+    }
+
+    size_t size(void)
+    {
+        return m.size();
+    }
+
+    void print(size_t colS, size_t rowS, size_t colE, size_t rowE)
+    {
+        for (size_t i = colS; i <= colE; ++i)
+        {
+            for(size_t j = rowS; j <= rowE; ++j)
+            {
+                std::cout << (*this)[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
 };
 
 
 
 int main()
 {
+#if 0       // from example
     Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
+    assert(matrix.size() == 0); // все ячейки свободны
+    auto a = matrix[0][0];
+    assert(a == -1);
+    assert(matrix.size() == 0);
     matrix[100][100] = 314;
-
+    assert(matrix[100][100] == 314);
+    assert(matrix.size() == 1);
+    // выведется одна строка
+    // 100100314
     for(auto c: matrix)
     {
-        size_t x = 1;
-        size_t y = 2;
-        int v = 3;
+        size_t x;
+        size_t y;
+        int v;
         std::tie(x, y, v) = c;
         std::cout << x << y << v << std::endl;
     }
-//    return 0;
-}
+#else
+    Matrix<int, 0> matrix;
 
+    for (size_t i = 0; i <= 9; ++i)
+    {
+        matrix[i][i] = i;
+        matrix[i][9-i] = i;
+    }
+
+    matrix.print(1,1,8,8);
+//    std::cout << "size = " << matrix.size() << std::endl;     // prints 18
+//    ((matrix[100][100] = 314) = 0) = 217;                     // supports canonical form of operator=
+#endif
+    return 0;
+}
 
