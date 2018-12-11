@@ -46,7 +46,7 @@ class Matrix
     {
         typename data_container::iterator it;
 
-        public:
+    public:
         MatrixIt(decltype(it) &&it) : it{it} {}
         MatrixIt& operator++() {
             ++it;
@@ -69,13 +69,13 @@ class Matrix
     };
 
     // Support class to work with [][] operator
-    class MatrixSup
+    class MatrixValue
     {
         class Matrix *mat;
         size_t row;
         size_t col;
 
-        const T& gett(void) const
+        const T& valueGet(void) const
         {
             auto search = mat->m.find(node{row, col});
             if (search != mat->m.end()) {
@@ -87,11 +87,11 @@ class Matrix
         }
 
     public:
-        MatrixSup(class Matrix *mat, size_t row) : mat(mat), row(row) {}
+        MatrixValue(class Matrix *mat, size_t row) : mat(mat), row(row) {}
 
         bool operator==(const T& other)
         {
-            return this->gett() == other;
+            return this->valueGet() == other;
         }
 
         auto & operator[](const size_t &col)
@@ -100,7 +100,7 @@ class Matrix
             return *this;
         }
 
-        MatrixSup & operator=(const T &t)
+        MatrixValue & operator=(const T &t)
         {
             auto n = node{row, col};
             auto search = mat->m.find(n);
@@ -117,10 +117,10 @@ class Matrix
             return *this;
         }
 
-        friend std::ostream& operator<< (std::ostream &os, MatrixSup &mm )
+        friend std::ostream& operator<< (std::ostream &os, MatrixValue &mm )
         {
-//            std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.gett();    // for tests only
-            std::cout << mm.gett();
+//            std::cout << "[" << mm.col << "][" << mm.row << "] = " << mm.valueGet();    // for tests only
+            std::cout << mm.valueGet();
             return os;
         }
     };
@@ -128,7 +128,7 @@ class Matrix
 public:
     auto operator[](const size_t &col)
     {
-        MatrixSup o{this, col};
+        MatrixValue o{this, col};
         return o;
     }
 
@@ -164,26 +164,6 @@ public:
 
 int main()
 {
-#if 0       // from example
-    Matrix<int, -1> matrix; // бесконечная матрица int заполнена значениями -1
-    assert(matrix.size() == 0); // все ячейки свободны
-    auto a = matrix[0][0];
-    assert(a == -1);
-    assert(matrix.size() == 0);
-    matrix[100][100] = 314;
-    assert(matrix[100][100] == 314);
-    assert(matrix.size() == 1);
-    // выведется одна строка
-    // 100100314
-    for(auto c: matrix)
-    {
-        size_t x;
-        size_t y;
-        int v;
-        std::tie(x, y, v) = c;
-        std::cout << x << y << v << std::endl;
-    }
-#else
     Matrix<int, 0> matrix;
 
     for (size_t i = 0; i <= 9; ++i)
@@ -193,9 +173,17 @@ int main()
     }
 
     matrix.print(1,1,8,8);
-//    std::cout << "size = " << matrix.size() << std::endl;     // prints 18
-//    ((matrix[100][100] = 314) = 0) = 217;                     // supports canonical form of operator=
-#endif
+    std::cout << matrix.size() << std::endl;
+    for(auto c: matrix)
+    {
+        size_t x;
+        size_t y;
+        int v;
+        std::tie(x, y, v) = c;
+        std::cout << x << y << v << std::endl;
+    }
+
+    ((matrix[100][100] = 314) = 0) = 217;                     // supports canonical form of operator=
     return 0;
 }
 
